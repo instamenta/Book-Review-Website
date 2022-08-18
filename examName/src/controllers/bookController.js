@@ -7,22 +7,28 @@ const { getErrorMessage } = require('../util');
 router.get('/', async (req, res) => {
     try {
         const books = await bookService.getAll().lean();
-
+        console.log(books)
         res.render('book/catalog', { books });
     } catch (error) {
         res.render('home/404');
     }
 });
 
+router.get('/create', isAuthenticated, (req, res) => {
+    res.render('book/create');
+});
 router.get('/:bookId', async (req, res) => {
 
     try {
+            console.log(req.params.bookId)  
         const book = await bookService.getOne(req.params.bookId).lean();
+
         if(!book) {
             throw {
                 message: 'Invalid ID'
             } 
         }
+        
         const isOwner = book.owner._id == req.user?._id;
         console.log("Is owner: ", isOwner)
         const wished = await hasWished(req.params.bookId, req.user?._id);
@@ -35,9 +41,6 @@ router.get('/:bookId', async (req, res) => {
     }
 });
 
-router.get('/create', isAuthenticated, (req, res) => {
-    res.render('book/create');
-});
 
 router.post('/create', isAuthenticated, async (req, res) => {
     try {
@@ -108,7 +111,7 @@ router.post('/edit/:bookId', isAuthenticated, async (req, res) => {
 
         await bookService.edit(req.params.bookId, req.body);
 
-        res.redirect(`/book/details/${book._id}`);
+        res.redirect(`/books/${book._id}`);
     } catch (error) {
         res.render('book/edit', { ...book, error: getErrorMessage(error) });
     }
