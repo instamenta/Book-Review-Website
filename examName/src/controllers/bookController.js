@@ -150,7 +150,7 @@ router.get('/wish/:bookId', isAuthenticated, async (req, res) => {
 
         await bookService.wish(book._id, req.user._id);
 
-        res.redirect(`/book/details/${book._id}`);
+        res.redirect(`/book/${book._id}`);
     } catch (error) {
         res.render('home/404');
     }
