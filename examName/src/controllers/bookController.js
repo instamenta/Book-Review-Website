@@ -7,7 +7,6 @@ const { getErrorMessage } = require('../util');
 router.get('/', async (req, res) => {
     try {
         const books = await bookService.getAll().lean();
-        console.log(books)
         res.render('book/catalog', { books });
     } catch (error) {
         res.render('home/404');
@@ -20,23 +19,18 @@ router.get('/create', isAuthenticated, (req, res) => {
 router.get('/:bookId', async (req, res) => {
 
     try {
-            console.log(req.params.bookId)  
         const book = await bookService.getOne(req.params.bookId).lean();
 
-        if(!book) {
+        if (!book) {
             throw {
                 message: 'Invalid ID'
-            } 
+            }
         }
-        
+
         const isOwner = book.owner._id == req.user?._id;
-        console.log("Is owner: ", isOwner)
         const wished = await hasWished(req.params.bookId, req.user?._id);
-        console.log('wished : ', wished);
-        console.log(book)
         res.render('book/details', { ...book, isOwner, wished });
     } catch (error) {
-        console.log(error);
         res.render('home/404');
     }
 });
@@ -44,8 +38,8 @@ router.get('/:bookId', async (req, res) => {
 
 router.post('/create', isAuthenticated, async (req, res) => {
     try {
-        let { title, author, genre, stars, image, bookReview} = req.body
-        
+        let { title, author, genre, stars, image, bookReview } = req.body
+
         let imageState = false
         imageState = image.startsWith('http://')
         imageState = image.startsWith('https://')
@@ -70,7 +64,7 @@ router.post('/create', isAuthenticated, async (req, res) => {
                 message: 'Stars must be a positive number between 1 - 5'
             }
         }
-        if (imageState==false) {
+        if (imageState == false) {
             throw {
                 message: 'Image must start with http:// or https://'
             }
@@ -119,7 +113,6 @@ router.post('/edit/:bookId', isAuthenticated, async (req, res) => {
 
 router.get('/delete/:bookId', isAuthenticated, async (req, res) => {
     const book = await bookService.getOne(req.params.bookId).lean();
-    console.log('okay')
     try {
         const isOwner = book.owner._id == req.user?._id;
         if (!isOwner) {
@@ -132,7 +125,7 @@ router.get('/delete/:bookId', isAuthenticated, async (req, res) => {
 
         res.redirect('/books');
     } catch (error) {
-        console.log(error);
+
         res.render('home/404');
     }
 });
@@ -150,16 +143,16 @@ router.get('/wish/:bookId', isAuthenticated, async (req, res) => {
 
         await bookService.wish(book._id, req.user._id);
 
-        res.redirect(`/book/${book._id}`);
+        res.redirect(`/books/${book._id}`);
     } catch (error) {
         res.render('home/404');
     }
 });
 
 const hasWished = async (bookId, userId) => {
-     const book = await bookService.getOne(bookId);
+    const book = await bookService.getOne(bookId);
 
     return book.wishingList.includes(userId);
- };
+};
 
 module.exports = router;

@@ -74,4 +74,8 @@ router.get('/logout', isAuthenticated, (req, res) => {
     res.redirect('/');
 });
 
+router.get('/profile', isAuthenticated, (req, res) => {
+
+    res.render('auth/profile', { ...req.user})
+})
 module.exports = router;
