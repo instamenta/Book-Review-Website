@@ -7,17 +7,17 @@ exports.getAll = () => Book.find();
 
 exports.getOne = bookId => Book.findById(bookId);
 
-exports.getOneWithBuyers = bookId => Book.findById(bookId).populate('buyAbook');
+exports.getOneWithWishingList = bookId => Book.findById(bookId).populate('wishingList');
 
 exports.edit = (bookId, data) => Book.findByIdAndUpdate(bookId, data, { runValidators: true });
 
 exports.delete = bookId => Book.findByIdAndDelete(bookId);
 
-exports.buy = async (bookId, buyerId) => {
+exports.wish = async (bookId, wisherId) => {
     const book = await Book.findById(bookId);
-    const buyer = await User.findById(buyerId);
+    const wisher = await User.findById(wisherId);
 
-    book.buyAbook.push(buyer);
+    book.wishingList.push(wisher);
 
     await book.save();
 };

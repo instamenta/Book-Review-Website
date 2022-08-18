@@ -14,16 +14,21 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/details/:bookId', async (req, res) => {
+router.get('/:bookId', async (req, res) => {
+    console.log('welldone')
     try {
         const book = await bookService.getOne(req.params.bookId).lean();
-
+        if(!book) {
+            throw {
+                message: 'Invalid ID'
+            } 
+        }
         const isOwner = book.owner._id == req.user?._id;
 
-        const bought = await hasBought(req.params.bookId, req.user?._id);
-        console.log(bought);
+        const wished = await hasWished(req.params.bookId, req.user?._id);
+        console.log(wished);
 
-        res.render('book/details', { ...book, isOwner, bought });
+        res.render('book/details', { ...book, isOwner, wished });
     } catch (error) {
         console.log(error);
         res.render('home/404');
@@ -128,18 +133,18 @@ router.get('/delete/:bookId', isAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/buy/:bookId', isAuthenticated, async (req, res) => {
-    const book = await bookService.getOneWithBuyers(req.params.bookId).lean();
+router.get('/wish/:bookId', isAuthenticated, async (req, res) => {
+    const book = await bookService.getOneWithWishingList(req.params.bookId).lean();
     try {
         const isOwner = book.owner._id == req.user?._id;
 
         if (isOwner) {
             throw {
-                message: 'Cannot buy if owner!!',
+                message: 'Cannot wish if owner!!',
             };
         }
 
-        await bookService.buy(book._id, req.user._id);
+        await bookService.wish(book._id, req.user._id);
 
         res.redirect(`/book/details/${book._id}`);
     } catch (error) {
@@ -147,10 +152,10 @@ router.get('/buy/:bookId', isAuthenticated, async (req, res) => {
     }
 });
 
-const hasBought = async (bookId, userId) => {
-    const book = await bookService.getOne(bookId);
+const hasWished = async (bookId, userId) => {
+     const book = await bookService.getOne(bookId);
 
-    return book.buyAbook.includes(userId);
-};
+    return book.wishingList.includes(userId);
+ };
 
 module.exports = router;
