@@ -12,11 +12,21 @@ router.post('/register', async (req, res) => {
     const { username, email, password, repPass } = req.body;
     console.log(req.body)
     try {
-        // if (password < 4 || repeatPass < 4) {
-        //     throw {
-        //         message: 'Password must be at least 4 chars long!',
-        //     };
-        // }
+        if (password.length < 3 || repPass.length < 3) {
+            throw {
+                message: 'Password must be at least 3 chars long!',
+            };
+        }
+        if (email.length < 10) {
+            throw {
+                message: 'Email must be at least 10 characters long'
+            }
+        }
+        if (username.length < 4) {
+            throw {
+                message: 'Username must be at least 4 characters long'
+            }
+        }
         if (password !== repPass) {
             throw {
                 message: 'Passwords must match!',
@@ -38,8 +48,19 @@ router.get('/login', (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    console.log(req.body);
     try {
+        if (password.length < 3) {
+            throw {
+                message: 'Password must be at least 3 chars long!',
+            };
+        }
+        if (email.length < 10) {
+            throw {
+                message: 'Email must be at least 10 characters long'
+            }
+        }
+        console.log(req.body);
+
         const token = await authService.login(email, password);
 
         res.cookie('session', token, { httpOnly: true });

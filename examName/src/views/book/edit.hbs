@@ -1,12 +1,12 @@
-<div>
+{{#if error}}<div>
         <div class="errorContainer">
             <p>{{error}}</p>
         </div>
-    </div>
+    </div>{{/if}}
 
     <section class="edit-form-container">
 
-        <form action="">
+        <form method="POST">
             <h3>Edit Book Review</h3>
             <label>Title</label>
             <input type="text" name="title" class="box" value="Harry Potter and the Philosopher's Stone" id="">
