@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:bookId', async (req, res) => {
-    console.log('welldone')
+
     try {
         const book = await bookService.getOne(req.params.bookId).lean();
         if(!book) {
@@ -24,10 +24,10 @@ router.get('/:bookId', async (req, res) => {
             } 
         }
         const isOwner = book.owner._id == req.user?._id;
-
+        console.log("Is owner: ", isOwner)
         const wished = await hasWished(req.params.bookId, req.user?._id);
-        console.log(wished);
-
+        console.log('wished : ', wished);
+        console.log(book)
         res.render('book/details', { ...book, isOwner, wished });
     } catch (error) {
         console.log(error);
@@ -41,7 +41,7 @@ router.get('/create', isAuthenticated, (req, res) => {
 
 router.post('/create', isAuthenticated, async (req, res) => {
     try {
-        let { title, author, genre, stars, image, review} = req.body
+        let { title, author, genre, stars, image, bookReview} = req.body
         
         let imageState = false
         imageState = image.startsWith('http://')
@@ -72,7 +72,7 @@ router.post('/create', isAuthenticated, async (req, res) => {
                 message: 'Image must start with http:// or https://'
             }
         }
-        if (review.length < 10) {
+        if (bookReview.length < 10) {
             throw {
                 message: 'Review must be at least 10 characters long'
             }
@@ -116,6 +116,7 @@ router.post('/edit/:bookId', isAuthenticated, async (req, res) => {
 
 router.get('/delete/:bookId', isAuthenticated, async (req, res) => {
     const book = await bookService.getOne(req.params.bookId).lean();
+    console.log('okay')
     try {
         const isOwner = book.owner._id == req.user?._id;
         if (!isOwner) {
@@ -126,7 +127,7 @@ router.get('/delete/:bookId', isAuthenticated, async (req, res) => {
 
         await bookService.delete(req.params.bookId);
 
-        res.redirect('/book');
+        res.redirect('/books');
     } catch (error) {
         console.log(error);
         res.render('home/404');

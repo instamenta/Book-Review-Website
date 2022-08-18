@@ -10,7 +10,7 @@ router.get('/register', (req, res) => {
 
 router.post('/register', async (req, res) => {
     const { username, email, password, repPass } = req.body;
-    console.log(req.body)
+
     try {
         if (password.length < 3 || repPass.length < 3) {
             throw {
@@ -59,8 +59,6 @@ router.post('/login', async (req, res) => {
                 message: 'Email must be at least 10 characters long'
             }
         }
-        console.log(req.body);
-
         const token = await authService.login(email, password);
 
         res.cookie('session', token, { httpOnly: true });

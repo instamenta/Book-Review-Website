@@ -20,7 +20,6 @@ exports.register = async (username, email, password) => {
 exports.login = async (email, password) => {
     try {
         const user = await User.findOne({ email });
-        console.log(user.password);
 
         const isValid = await bcrypt.compare(password, user.password);
 

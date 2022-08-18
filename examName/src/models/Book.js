@@ -14,6 +14,10 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Image is required!'],
     },
+    bookReview: {
+        type: String,
+        required: [true , 'Book Review is required!']
+    },
     stars: {
         type: Number,
         required: [true, 'Stars are required!'],
